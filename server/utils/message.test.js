@@ -1,6 +1,6 @@
 const expect = require('expect');
 
-let {generateMessage} = require('./message');
+let {generateMessage,generateLocationMessage} = require('./message');
 
 describe('generateMessage', () => {
 	it('should generate correct message object', () => {
@@ -12,5 +12,17 @@ describe('generateMessage', () => {
 
 		expect(res).toMatchObject(mock);
 		expect(typeof res.createdAt).toBe("number");
-	})
-})
+	});
+});
+describe('generateMessage', () => {
+	it('should generate correct location object', () => {
+		const mock = {
+			from:'Admin: ',
+			url:'https://www.google.com/maps?q=12,34'
+		},
+		res = generateLocationMessage('Admin: ', '12', '34');
+
+		expect(res).toMatchObject(mock);
+		expect(typeof res.createdAt).toBe("number");
+	});
+});
