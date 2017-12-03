@@ -10,25 +10,42 @@ function scrollToBottom(){
 	lastMessageHeight = newMessage.prev().innerHeight();
 
 	if(clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight){
-		messages.scrollTop(scor);
+		messages.scrollTop(scrollHeight);
 	}
 }
 
 socket.on('connect', () => {
-	console.log('Connected to server');
+	const params = $.deparam(window.location.search);
+	socket.emit('join',params, (err) => {
+		if(err){
+			alert(err);
+			window.location.href = '/'
+		} else{
+			console.log('No error');
+		}
+	});
 });
 socket.on('disconnect', () => {
-	console.log('disconnected from server')
+	console.log('disconnected from server');
 });
+
+socket.on('updateUserList',function(users){
+	let ol = $('<ol></ol>');
+
+	users.forEach(function (user){
+		ol.append($('<li></li>').text(user));
+		$('#users').html(ol);
+	})	
+})
 
 socket.on('newMessage', function(message){
 	const formattedTime = moment(message.createdAt).format('h:mm a'),
-	template = $('#message-template').html(),
-	html = Mustache.render(template,{
-		text:message.text,
-		from:message.from,
-		createdAt:formattedTime
-	});
+				template = $('#message-template').html(),
+				html = Mustache.render(template,{
+					text:message.text,
+					from:message.from,
+					createdAt:formattedTime
+				});
 
 	$('#messages').append(html);
 	scrollToBottom();
@@ -39,12 +56,12 @@ socket.on('newMessage', function(message){
 
 socket.on('newLocationMessage', function(message){
 	const formattedTime = moment(message.createdAt).format('h:mm a');
-	template = $('#location-message-template').html(),
-	html = Mustache.render(template,{
-		text:message.text,
-		from:message.from,
-		createdAt:formattedTime
-	});
+				template = $('#location-message-template').html(),
+				html = Mustache.render(template,{
+					text:message.text,
+					from:message.from,
+					createdAt:formattedTime
+				});
 
 	$('#messages').append(html);
 	scrollToBottom();
